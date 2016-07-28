@@ -1,6 +1,7 @@
 package net.jcazevedo.moultingyaml
 
 import com.github.nscala_time.time.Imports._
+import org.yaml.snakeyaml.LoadingConfig
 import java.net.URLDecoder
 import org.specs2.execute.Result
 import org.specs2.mutable._
@@ -8,6 +9,7 @@ import scala.io.Source
 import scala.util.{ Failure, Success, Try }
 
 class YamlParserSpec extends Specification {
+
   def getResourceURL(resource: String): String =
     URLDecoder.decode(getClass.getResource(resource).getFile, "UTF-8")
 
@@ -25,23 +27,25 @@ class YamlParserSpec extends Specification {
   }
 
   "The provided YAML parser" should {
-    "correctly parse sequences of scalars" !
+    "correctly parse sequences of scalars" in {
       withYaml("/examples/ex1.yaml") { yaml =>
         yaml mustEqual YamlArray(
           YamlString("Mark McGwire"),
           YamlString("Sammy Sosa"),
           YamlString("Ken Griffey"))
       }
+    }
 
-    "correctly parse mappings of scalars to scalars" !
+    "correctly parse mappings of scalars to scalars" in {
       withYaml("/examples/ex2.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("hr") -> YamlNumber(65),
           YamlString("avg") -> YamlNumber(0.278),
           YamlString("rbi") -> YamlNumber(147))
       }
+    }
 
-    "correctly parse mappings of scalars to sequences" !
+    "correctly parse mappings of scalars to sequences" in {
       withYaml("/examples/ex3.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("american") -> YamlArray(
@@ -53,8 +57,9 @@ class YamlParserSpec extends Specification {
             YamlString("Chicago Cubs"),
             YamlString("Atlanta Braves")))
       }
+    }
 
-    "correctly parse sequences of mappings" !
+    "correctly parse sequences of mappings" in {
       withYaml("/examples/ex4.yaml") { yaml =>
         yaml mustEqual YamlArray(
           YamlObject(
@@ -66,8 +71,9 @@ class YamlParserSpec extends Specification {
             YamlString("hr") -> YamlNumber(63),
             YamlString("avg") -> YamlNumber(0.288)))
       }
+    }
 
-    "correctly parse sequences of sequences" !
+    "correctly parse sequences of sequences" in {
       withYaml("/examples/ex5.yaml") { yaml =>
         yaml mustEqual YamlArray(
           YamlArray(
@@ -83,8 +89,9 @@ class YamlParserSpec extends Specification {
             YamlNumber(63),
             YamlNumber(0.288)))
       }
+    }
 
-    "correctly parse mappings of mappings" !
+    "correctly parse mappings of mappings" in {
       withYaml("/examples/ex6.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("Mark McGwire") -> YamlObject(
@@ -94,8 +101,9 @@ class YamlParserSpec extends Specification {
             YamlString("hr") -> YamlNumber(63),
             YamlString("avg") -> YamlNumber(0.288)))
       }
+    }
 
-    "correctly parse aliased nodes" !
+    "correctly parse aliased nodes" in {
       withYaml("/examples/ex7.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("hr") ->
@@ -107,8 +115,9 @@ class YamlParserSpec extends Specification {
               YamlString("Sammy Sosa"),
               YamlString("Ken Griffey")))
       }
+    }
 
-    "correctly parse mappings between sequences" !
+    "correctly parse mappings between sequences" in {
       withYaml("/examples/ex8.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlArray(
@@ -132,8 +141,9 @@ class YamlParserSpec extends Specification {
                 new DateTime("2001-08-14", DateTimeZone.UTC).getMillis(),
                 DateTimeZone.getDefault()))))
       }
+    }
 
-    "correctly parse in-line nested mapping" !
+    "correctly parse in-line nested mapping" in {
       withYaml("/examples/ex9.yaml") { yaml =>
         yaml mustEqual YamlArray(
           YamlObject(
@@ -146,22 +156,25 @@ class YamlParserSpec extends Specification {
             YamlString("item") -> YamlString("Big Shoes"),
             YamlString("quantity") -> YamlNumber(1)))
       }
+    }
 
-    "correctly preserve new lines in literals" !
+    "correctly preserve new lines in literals" in {
       withYaml("/examples/ex10.yaml") { yaml =>
         yaml mustEqual YamlString(
           """\//||\/||
             |// ||  ||__
             |""".stripMargin)
       }
+    }
 
-    "correctly replace newlines by spaces in plain scalar" !
+    "correctly replace newlines by spaces in plain scalar" in {
       withYaml("/examples/ex11.yaml") { yaml =>
         yaml mustEqual YamlString(
           "Mark McGwire's year was crippled by a knee injury.")
       }
+    }
 
-    "correctly parse folded new lines" !
+    "correctly parse folded new lines" in {
       withYaml("/examples/ex12.yaml") { yaml =>
         yaml mustEqual YamlString(
           """Sammy Sosa completed another fine season with great stats.
@@ -172,8 +185,9 @@ class YamlParserSpec extends Specification {
             |What a year!
             |""".stripMargin)
       }
+    }
 
-    "correctly determine scope by indentation" !
+    "correctly determine scope by indentation" in {
       withYaml("/examples/ex13.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("name") ->
@@ -183,8 +197,9 @@ class YamlParserSpec extends Specification {
           YamlString("stats") ->
             YamlString("65 Home Runs\n0.278 Batting Average\n"))
       }
+    }
 
-    "correctly parse quoted scalars" !
+    "correctly parse quoted scalars" in {
       withYaml("/examples/ex14.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("unicode") ->
@@ -200,8 +215,9 @@ class YamlParserSpec extends Specification {
           YamlString("tie-fighter") ->
             YamlString("""|\-*-/|"""))
       }
+    }
 
-    "correctly parse multi-line flow scalars" !
+    "correctly parse multi-line flow scalars" in {
       withYaml("/examples/ex15.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("plain") ->
@@ -209,8 +225,9 @@ class YamlParserSpec extends Specification {
           YamlString("quoted") ->
             YamlString("So does this quoted scalar.\n"))
       }
+    }
 
-    "correctly parse integers" !
+    "correctly parse integers" in {
       withYaml("/examples/ex16.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("canonical") ->
@@ -224,8 +241,9 @@ class YamlParserSpec extends Specification {
           YamlString("hexadecimal") ->
             YamlNumber(12))
       }
+    }
 
-    "correctly parse large integers" !
+    "correctly parse large integers" in {
       withYaml("/examples/ex16-2.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("long_canonical") ->
@@ -233,8 +251,9 @@ class YamlParserSpec extends Specification {
           YamlString("bigint_canonical") ->
             YamlNumber(BigInt("92233720368547758070")))
       }
+    }
 
-    "correctly parse floating point numbers" !
+    "correctly parse floating point numbers" in {
       withYaml("/examples/ex17.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("canonical") ->
@@ -246,8 +265,9 @@ class YamlParserSpec extends Specification {
           YamlString("fixed") ->
             YamlNumber(1230.15))
       }
+    }
 
-    "correctly parse miscellaneous scalars" !
+    "correctly parse miscellaneous scalars" in {
       withYaml("/examples/ex18.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlNull ->
@@ -259,8 +279,9 @@ class YamlParserSpec extends Specification {
           YamlString("string") ->
             YamlString("12345"))
       }
+    }
 
-    "correctly parse timestamps" !
+    "correctly parse timestamps" in {
       withYaml("/examples/ex19.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("canonical") ->
@@ -274,24 +295,27 @@ class YamlParserSpec extends Specification {
               new DateTime("2002-12-14", DateTimeZone.UTC).getMillis(),
               DateTimeZone.getDefault())))
       }
+    }
 
-    "correctly parse explicit sets" !
+    "correctly parse explicit sets" in {
       withYaml("/examples/ex20.yaml") { yaml =>
         yaml mustEqual YamlSet(
           YamlString("Mark McGwire"),
           YamlString("Sammy Sosa"),
           YamlString("Ken Griff"))
       }
+    }
 
-    "correctly parse explicit ordered mappings" !
+    "correctly parse explicit ordered mappings" in {
       withYaml("/examples/ex21.yaml") { yaml =>
         yaml mustEqual YamlObject(
           YamlString("Mark McGwire") -> YamlNumber(65),
           YamlString("Sammy Sosa") -> YamlNumber(63),
           YamlString("Ken Griffy") -> YamlNumber(58))
       }
+    }
 
-    "correctly parse multiple documents in a stream" !
+    "correctly parse multiple documents in a stream" in {
       withYamls("/examples/ex22.yaml") { yamls =>
         yamls mustEqual Seq(
           YamlArray(
@@ -302,5 +326,32 @@ class YamlParserSpec extends Specification {
             YamlString("Chicago Cubs"),
             YamlString("St Louis Cardinals")))
       }
+    }
+
+    "correctly not error with duplicates as default" in {
+      withYamls("/examples/ex23.yaml") { yamls =>
+        yamls mustEqual List(YamlObject(
+          YamlString("foobar") -> YamlString("has-duplicate-keys"),
+          YamlString("mapdata") -> YamlObject(
+            YamlString("someitem") -> YamlObject(
+              YamlString("id") -> YamlString("daaf8911-36e4-4e92-86ea-eb77ac2c1e91"),
+              YamlString("url") -> YamlString("http://test.com/sample/v55/foobar")
+            )
+          )
+        ))
+      }
+    }
+
+    "correctly throw an exception due to duplicate keys" in {
+
+      implicit val loadingConfig = new LoadingConfig()
+      loadingConfig.setAllowDuplicateKeys(false)
+      (
+        (
+          Source.fromFile(getResourceURL("/examples/ex23.yaml")).mkString.parseYamls
+        ) must throwAn[IllegalStateException]).message must startWith(
+            "Got the exception java.lang.IllegalStateException: duplicate key: someitem"
+          )
+    }
   }
 }

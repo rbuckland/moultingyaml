@@ -8,10 +8,12 @@ version := "0.3-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 
+resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
+
 libraryDependencies ++= Seq(
   "com.github.nscala-time" %% "nscala-time"   % "2.12.0",
   "org.scala-lang"          % "scala-reflect" % "2.11.8",
-  "org.yaml"                % "snakeyaml"     % "1.17",
+  "org.yaml"                % "snakeyaml"     % "1.18.i337",
   "org.specs2"             %% "specs2-core"   % "3.8.4"  % "test")
 
 scalacOptions ++= Seq(

@@ -2,6 +2,7 @@ package net.jcazevedo
 
 import com.github.nscala_time.time.Imports._
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.LoadingConfig
 import scala.collection.JavaConverters._
 
 package object moultingyaml {
@@ -60,10 +61,11 @@ package object moultingyaml {
   }
 
   implicit class PimpedString(val string: String) extends AnyVal {
-    def parseYaml: YamlValue =
-      convertToYamlValue(new Yaml().load(string))
 
-    def parseYamls: Seq[YamlValue] =
-      new Yaml().loadAll(string).asScala.map(convertToYamlValue).toSeq
+    def parseYaml()(implicit loadingConfig: LoadingConfig = new LoadingConfig()): YamlValue =
+      convertToYamlValue(new Yaml(loadingConfig).load(string))
+
+    def parseYamls()(implicit loadingConfig: LoadingConfig = new LoadingConfig()): Seq[YamlValue] =
+      new Yaml(loadingConfig).loadAll(string).asScala.map(convertToYamlValue).toSeq
   }
 }
